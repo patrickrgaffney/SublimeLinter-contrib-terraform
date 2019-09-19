@@ -3,7 +3,7 @@ import logging
 import os
 import re
 
-from SublimeLinter.lint import Linter, ERROR
+from SublimeLinter.lint import Linter
 from SublimeLinter.lint.linter import LintMatch
 
 logger = logging.getLogger('SublimeLinter.plugin.terraform')
@@ -18,13 +18,6 @@ class Terraform(Linter):
     # The validate command uses a one-based reporting
     # for line and column numbers.
     line_col_base = (1, 1)
-
-    # Default error type (for when the regex can't parse one).
-    default_type = ERROR
-
-    # Regex will parse multiple lines to find error messages.
-    multiline = True
-    regex = OUTPUT_RE
 
     # A dict of defaults for the linter’s settings.
     defaults = {
