@@ -1,28 +1,12 @@
-import re
-from SublimeLinter.lint import Linter, ERROR
-from SublimeLinter.lint.linter import LintMatch
-from os.path import basename
 import json
 import logging
+import os
+import re
+
+from SublimeLinter.lint import Linter, ERROR
+from SublimeLinter.lint.linter import LintMatch
 
 logger = logging.getLogger('SublimeLinter.plugin.terraform')
-
-# Compile the multi-line regular expression
-# to pull the relvent bits from the JSON output.
-OUTPUT_RE = re.compile(
-	r'\"severity\":\s*'
-	r'\"((?P<error>error)|(?P<warning>warning))\",\s*'
-	r'\"summary\":\s*'
-	r'\"(?P<message>.+\s*.+)\",\s*'
-	r'\"range\".+\s*'
-	r'\"filename\":\s*'
-	r'\"(?P<filename>.+)\",\s*'
-	r'\"start\":.+\s*'
-	r'\"line\":\s*'
-	r'(?P<line>\d+),\s*'
-	r'\"column\":\s*'
-	r'(?P<col>\d+)'
-)
 
 class Terraform(Linter):
 		# The executable plus all arguments used to lint.
@@ -56,7 +40,13 @@ class Terraform(Linter):
     	output directly instead of using a multiline regex to walk
     	through it.
     	"""
-    	print(output)
+    	current_file = self.view.file_name()
+    	project_folder = self.view.window().folders()[0]
+
+    	# TODO: this could break -- need a better solution to 
+    	# getting project folder path.
+    	project_path = os.path.commonprefix([project_folder, current_file])
+
     	try:
     		data = json.loads(output)
     	except Exception as e:
@@ -81,57 +71,14 @@ class Terraform(Linter):
     		line = issue["range"]["start"]["line"] - self.line_col_base[0]
     		col = issue["range"]["start"]["column"] - self.line_col_base[0]
     		filename = issue["range"]["filename"]
+    		full_file_name = "{}/{}".format(project_path, filename)
 
-    		lm = LintMatch(
-    			match={message, error, warning, line, col, filename},
-    			line=int(line),
-    			col=int(col),
+    		yield LintMatch(
+    			match=issue,
+    			filename=full_file_name,
+    			line=line,
+    			col=col,
     			error=error,
     			warning=warning,
     			message=message
     		)
-    		print(lm)
-    		yield lm
-
-   #  def split_match(self, match):
-   #  	"""
-   #  	Override to fix the "message" output and to determine if we
-			# should lint this file.
-   #  	"""
-   #  	match, line, col, error, warning, message, near = (
-   #  		super().split_match(match)
-   #  	)
-
-   #  	print({match, line, col, error, warning, message, near})
-
-   #  	# matched_file = match.groupdict()['filename']
-   #  	# linted_file = basename(self.filename)
-
-   #  	# # If the current file being linted is not the file wherein
-   #  	# # we matched on an error, we override the return to avoid
-   #  	# # showing "ghost" errors in the wrong file.
-   #  	# if matched_file != linted_file:
-   #  	# 	return None, None, None, None, None, '', None
-
-   #  	# new_msg = clean_up_message(message)
-
-   #  	return match, line, col, error, warning, new_msg, near
-
-# Terraform validate returns a summary and a detail. We include both
-# in the named capture group "message". These are matched over two
-# separate JSON keys, so the string sent to split_match() contains
-# a lot of extra junk -- namely the "detail" key and some whitespace.
-# def clean_up_message(msg):
-# 	# Split the message on the end of the "message" key value.
-# 	split_msg = msg.split('",')
-
-# 	# The first match is the value from the "summary" key.
-# 	summary = split_msg[0]
-
-# 	# Remove the whitespace and "detail" key from the message.
-# 	raw_detail = re.sub(r'\s*\"detail\":\s*\"', '', split_msg[1])
-
-# 	# Un-escape all JSON-escape double-quotes.
-# 	detail = raw_detail.replace('\\"', '"')
-
-# 	return '{summary}: {detail}'.format(summary=summary, detail=detail)
