@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import re
 
 from SublimeLinter.lint import Linter
 from SublimeLinter.lint.linter import LintMatch
