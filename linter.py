@@ -31,6 +31,10 @@ class Terraform(Linter):
     # Name of the linter.
     name = 'terraform'
 
+    # The validate command uses a one-based reporting
+    # for line and column numbers.
+    line_col_base = (1, 1)
+
     # Default error type (for when the regex can't parse one).
     default_type = ERROR
 
@@ -74,8 +78,8 @@ class Terraform(Linter):
     		severity = issue["severity"]
     		error = severity if severity == "error" else ""
     		warning = severity if severity == "warning" else ""
-    		line = issue["range"]["start"]["line"]
-    		col = issue["range"]["start"]["column"]
+    		line = issue["range"]["start"]["line"] - self.line_col_base[0]
+    		col = issue["range"]["start"]["column"] - self.line_col_base[0]
     		filename = issue["range"]["filename"]
 
     		lm = LintMatch(
