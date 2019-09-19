@@ -1,5 +1,6 @@
 import re
-from SublimeLinter.lint import Linter
+from SublimeLinter.lint import Linter, ERROR
+from os.path import basename
 
 # Compile the multi-line regular expression
 # to pull the relvent bits from the JSON output.
@@ -24,9 +25,11 @@ class Terraform(Linter):
     # Name of the linter.
     name = 'terraform'
 
+    # Default error type (for when the regex can't parse one).
+    default_type = ERROR
+
     # Regex will parse multiple lines to find error messages.
     multiline = True
-
     regex = OUTPUT_RE
 
     # A dict of defaults for the linter’s settings.
