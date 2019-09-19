@@ -38,8 +38,8 @@ class Terraform(Linter):
         'selector': 'source.terraform'
     }
 
-    # Turn off stdin.
-    # template_suffix = 'tf'
+    # Turn off stdin. The validate command requires a directory.
+    template_suffix = '-'
 
     def split_match(self, match):
     	"""Override to fix the "message" output."""
