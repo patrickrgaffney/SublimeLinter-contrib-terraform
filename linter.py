@@ -42,10 +42,22 @@ class Terraform(Linter):
     template_suffix = '-'
 
     def split_match(self, match):
-    	"""Override to fix the "message" output."""
+    	"""
+    	Override to fix the "message" output and to determine if we
+			should lint this file.
+    	"""
     	match, line, col, error, warning, message, near = (
     		super().split_match(match)
     	)
+
+    	matched_file = match.groupdict()['filename']
+    	linted_file = basename(self.filename)
+
+    	# If the current file being linted is not the file wherein
+    	# we matched on an error, we override the return to avoid
+    	# showing "ghost" errors in the wrong file.
+    	if matched_file != linted_file:
+    		return None, None, None, None, None, '', None
 
     	new_msg = clean_up_message(message)
 
