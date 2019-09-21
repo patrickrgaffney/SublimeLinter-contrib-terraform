@@ -5,6 +5,8 @@ SublimeLinter-contrib-terraform
 
 This linter plugin for [SublimeLinter](https://github.com/SublimeLinter/SublimeLinter) provides an interface to [Terraform `validate`](https://www.terraform.io/docs/commands/validate.html). It will be used with files that have the `.tf` syntax.
 
+![screenshot](screenshot.png)
+
 ## Installation
 
 SublimeLinter must be installed in order to use this plugin. 
