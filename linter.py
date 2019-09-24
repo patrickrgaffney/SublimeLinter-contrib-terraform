@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 
 from SublimeLinter.lint import Linter, LintMatch
 
@@ -8,8 +7,12 @@ logger = logging.getLogger('SublimeLinter.plugin.terraform')
 
 
 class Terraform(Linter):
-    # The executable plus all arguments used to lint.
-    cmd = ('terraform', 'validate', '--json')
+    # The executable plus all arguments used to lint. The $file_path
+    # will be set by super(), and will be the folder path of the file
+    # currently in the active view. The "validate" command only operates
+    # on directories (modules), so it's provided here to avoid the
+    # command attempting to guess what directory we are at.
+    cmd = ('terraform', 'validate', '--json', '${file_path}')
 
     # The validate command uses a one-based reporting
     # for line and column numbers.
@@ -29,13 +32,6 @@ class Terraform(Linter):
         output directly instead of using a multiline regex to walk
         through it.
         """
-        current_file = self.view.file_name()
-        project_folder = self.view.window().folders()[0]
-
-        # TODO: this could break -- need a better solution to
-        # getting project folder path.
-        project_path = os.path.commonprefix([project_folder, current_file])
-
         try:
             data = json.loads(output)
         except Exception as e:
@@ -60,10 +56,9 @@ class Terraform(Linter):
             line = issue["range"]["start"]["line"] - self.line_col_base[0]
             col = issue["range"]["start"]["column"] - self.line_col_base[1]
             filename = issue["range"]["filename"]
-            full_file_name = "{}/{}".format(project_path, filename)
 
             yield LintMatch(
-              filename=full_file_name,
+              filename=filename,
               line=line,
               col=col,
               error_type=severity,
