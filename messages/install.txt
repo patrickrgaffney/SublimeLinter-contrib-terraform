@@ -1,6 +1,6 @@
-SublimeLinter-contrib-__linter__
+SublimeLinter-contrib-terraform
 -------------------------------
 This linter plugin for SublimeLinter provides an interface to Terraform validate.
 
 For more information, please see:
-https://github.com/__user__/SublimeLinter-contrib-terraform
+https://github.com/patrickrgaffney/SublimeLinter-contrib-terraform
