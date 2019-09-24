@@ -24,7 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Check out repository to $GITHUB_WORKSPACE.
-      - uses: actions/checkout@v1
+      - name: "Check out source code"
+        uses: actions/checkout@v1
 
       # Set up Python interpreter.
       - name: Set up Python 3.7
