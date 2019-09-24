@@ -58,7 +58,7 @@ class Terraform(Linter):
             # "severity" will be either "error" or "warning"
             severity = issue["severity"]
             line = issue["range"]["start"]["line"] - self.line_col_base[0]
-            col = issue["range"]["start"]["column"] - self.line_col_base[0]
+            col = issue["range"]["start"]["column"] - self.line_col_base[1]
             filename = issue["range"]["filename"]
             full_file_name = "{}/{}".format(project_path, filename)
 
