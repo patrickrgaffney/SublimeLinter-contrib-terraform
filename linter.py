@@ -63,7 +63,6 @@ class Terraform(Linter):
             full_file_name = "{}/{}".format(project_path, filename)
 
             yield LintMatch(
-              match=issue,
               filename=full_file_name,
               line=line,
               col=col,
