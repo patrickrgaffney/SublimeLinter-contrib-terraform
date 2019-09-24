@@ -46,15 +46,20 @@ class Terraform(Linter):
 
         # Iterate through the errors, yielding LintMatchs.
         for issue in data['diagnostics']:
+            # "summary" is a formatted high-level error code.
+            # "detail" is an actual error message.
             message = '{summary}: {detail}'.format(
-              summary=issue['summary'],
-              detail=issue['detail']
+                summary=issue['summary'],
+                detail=issue['detail'],
             )
 
             # "severity" will be either "error" or "warning"
             severity = issue["severity"]
+
             line = issue["range"]["start"]["line"] - self.line_col_base[0]
             col = issue["range"]["start"]["column"] - self.line_col_base[1]
+
+            # Only the basename is provided in "filename".
             filename = issue["range"]["filename"]
 
             yield LintMatch(
