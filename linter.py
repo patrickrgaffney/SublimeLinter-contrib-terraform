@@ -12,9 +12,6 @@ class Terraform(Linter):
     # The executable plus all arguments used to lint.
     cmd = ('terraform', 'validate', '--json')
 
-    # Name of the linter.
-    name = 'terraform'
-
     # The validate command uses a one-based reporting
     # for line and column numbers.
     line_col_base = (1, 1)
