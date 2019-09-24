@@ -54,9 +54,9 @@ class Terraform(Linter):
               summary=issue['summary'],
               detail=issue['detail']
             )
+
+            # "severity" will be either "error" or "warning"
             severity = issue["severity"]
-            error = severity if severity == "error" else ""
-            warning = severity if severity == "warning" else ""
             line = issue["range"]["start"]["line"] - self.line_col_base[0]
             col = issue["range"]["start"]["column"] - self.line_col_base[0]
             filename = issue["range"]["filename"]
@@ -67,7 +67,6 @@ class Terraform(Linter):
               filename=full_file_name,
               line=line,
               col=col,
-              error=error,
-              warning=warning,
-              message=message
+              error_type=severity,
+              message=message,
             )
