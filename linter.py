@@ -46,21 +46,32 @@ class Terraform(Linter):
 
         # Iterate through the errors, yielding LintMatchs.
         for issue in data['diagnostics']:
-            # "summary" is a formatted high-level error code.
-            # "detail" is an actual error message.
-            message = '{summary}: {detail}'.format(
-                summary=issue['summary'],
-                detail=issue['detail'],
-            )
-
-            # "severity" will be either "error" or "warning"
+            line, col = 0, 0
+            filename = self.context.get("file_name")
+            message = "Error"
             severity = issue["severity"]
 
-            line = issue["range"]["start"]["line"] - self.line_col_base[0]
-            col = issue["range"]["start"]["column"] - self.line_col_base[1]
+            # Catch the specific error for unsatisfied plugin
+            # requirements. The "detail" key is rather long.
+            # If a "detail" key was given, we also use that.
+            if issue["summary"] == "Could not satisfy plugin requirements":
+                message = issue['summary']
+            elif "detail" in issue:
+                message = '{summary}: {detail}'.format(
+                    summary=issue['summary'].replace("\n", " "),
+                    detail=issue['detail'].replace("\n", " "),
+                )
+            else:
+                message = issue['summary'].replace("\n", " ")
 
-            # Only the basename is provided in "filename".
-            filename = issue["range"]["filename"]
+            # If the error or warning occured on the entire file,
+            # there won't be a "range" key, so we use the defaults.
+            if "range" in issue:
+                line = issue["range"]["start"]["line"] - self.line_col_base[0]
+                col = issue["range"]["start"]["column"] - self.line_col_base[1]
+
+                # Only the basename is provided in "filename".
+                filename = issue["range"]["filename"]
 
             yield LintMatch(
               filename=filename,
