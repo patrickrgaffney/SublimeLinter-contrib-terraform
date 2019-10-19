@@ -1,0 +1,10 @@
+SublimeLinter-terraform v0.3.0
+==============================
+
+### Changed
+
+- Strip all newlines from the error message output.
+
+### Fixed
+
+- Fix a bug where files that occur on an entire file/module would break the linter.
